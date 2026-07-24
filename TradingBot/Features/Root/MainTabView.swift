@@ -18,20 +18,9 @@ struct MainTabView: View {
                 HistoryView(store: container.store)
             }
             Tab("Insights", systemImage: "lightbulb.fill") {
-                PlaceholderScreen(title: "Insights")
+                InsightsView(store: container.store)
             }
         }
         .task { container.store.startPolling() }
-    }
-}
-
-struct PlaceholderScreen: View {
-    let title: String
-
-    var body: some View {
-        NavigationStack {
-            Text(title)
-                .navigationTitle(title)
-        }
     }
 }
