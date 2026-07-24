@@ -5,6 +5,7 @@ import Observation
 @MainActor
 final class AppContainer {
     let repository: SnapshotRepository
+    let store: SnapshotStore
 
     init(configuration: AppConfiguration = AppConfiguration()) {
         let provider: any BotDataProvider
@@ -13,11 +14,14 @@ final class AppContainer {
         } else {
             provider = BundledBotDataProvider()
         }
-        self.repository = SnapshotRepository(provider: provider, cache: JSONCacheStore())
+        let repository = SnapshotRepository(provider: provider, cache: JSONCacheStore())
+        self.repository = repository
+        self.store = SnapshotStore(repository: repository)
     }
 
     /// Test seam: inject any repository.
     init(repository: SnapshotRepository) {
         self.repository = repository
+        self.store = SnapshotStore(repository: repository)
     }
 }
