@@ -1,10 +1,12 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @Environment(AppContainer.self) private var container
+
     var body: some View {
         TabView {
             Tab("Dashboard", systemImage: "house.fill") {
-                PlaceholderScreen(title: "Dashboard")
+                DashboardView(store: container.store)
             }
             Tab("Portfolio", systemImage: "chart.pie.fill") {
                 PlaceholderScreen(title: "Portfolio")
@@ -19,6 +21,7 @@ struct MainTabView: View {
                 PlaceholderScreen(title: "Insights")
             }
         }
+        .task { container.store.startPolling() }
     }
 }
 
