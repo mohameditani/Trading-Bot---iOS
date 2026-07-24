@@ -15,7 +15,7 @@ struct MainTabView: View {
                 PositionsView(store: container.store)
             }
             Tab("History", systemImage: "clock.fill") {
-                PlaceholderScreen(title: "History")
+                HistoryView(store: container.store)
             }
             Tab("Insights", systemImage: "lightbulb.fill") {
                 PlaceholderScreen(title: "Insights")
