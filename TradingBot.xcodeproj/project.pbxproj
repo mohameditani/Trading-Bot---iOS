@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXFileReference section */
+		AA1000000000000000000003 /* TradingBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TradingBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA1000000000000000000004 /* TradingBotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TradingBotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA1000000000000000000005 /* TradingBotUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TradingBotUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AA1000000000000000000010 /* TradingBot */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
