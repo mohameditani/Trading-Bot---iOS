@@ -1,0 +1,88 @@
+{
+  "dashboard": {
+    "totalEquity": 179.79,
+    "balance": 81.67,
+    "winRate": 0.222,
+    "todayPnL": 0.0,
+    "allTimePnL": -21.7,
+    "openPositionsCount": 1,
+    "totalTrades": 27,
+    "equityCurve": [
+      { "date": "2026-06-24T00:00:00Z", "equity": 201.5 },
+      { "date": "2026-06-27T00:00:00Z", "equity": 196.2 },
+      { "date": "2026-06-30T00:00:00Z", "equity": 189.8 },
+      { "date": "2026-07-03T00:00:00Z", "equity": 172.4 },
+      { "date": "2026-07-06T00:00:00Z", "equity": 158.1 },
+      { "date": "2026-07-09T00:00:00Z", "equity": 149.6 },
+      { "date": "2026-07-12T00:00:00Z", "equity": 133.2 },
+      { "date": "2026-07-15T00:00:00Z", "equity": 121.7 },
+      { "date": "2026-07-18T00:00:00Z", "equity": 104.3 },
+      { "date": "2026-07-21T00:00:00Z", "equity": 91.5 },
+      { "date": "2026-07-23T00:00:00Z", "equity": 79.8 }
+    ]
+  },
+  "portfolio": {
+    "high": 185.0,
+    "low": 75.0,
+    "current": 79.8,
+    "rangeStart": "2026-06-24T00:00:00Z",
+    "rangeEnd": "2026-07-23T00:00:00Z",
+    "equityCurve": [
+      { "date": "2026-06-24T00:00:00Z", "equity": 185.0 },
+      { "date": "2026-06-27T00:00:00Z", "equity": 181.2 },
+      { "date": "2026-06-30T00:00:00Z", "equity": 174.8 },
+      { "date": "2026-07-03T00:00:00Z", "equity": 160.4 },
+      { "date": "2026-07-06T00:00:00Z", "equity": 148.1 },
+      { "date": "2026-07-09T00:00:00Z", "equity": 139.6 },
+      { "date": "2026-07-12T00:00:00Z", "equity": 125.2 },
+      { "date": "2026-07-15T00:00:00Z", "equity": 114.7 },
+      { "date": "2026-07-18T00:00:00Z", "equity": 99.3 },
+      { "date": "2026-07-21T00:00:00Z", "equity": 87.5 },
+      { "date": "2026-07-23T00:00:00Z", "equity": 79.8 }
+    ]
+  },
+  "positions": [
+    {
+      "id": "pos-1",
+      "symbol": "BTCUSDT",
+      "side": "LONG",
+      "entryPrice": 65413.1,
+      "currentPrice": 64857.0,
+      "quantity": 0.003,
+      "leverage": 2,
+      "margin": 98.12,
+      "takeProfit": 67375.5,
+      "stopLoss": 64431.9,
+      "unrealizedPnL": -1.67,
+      "openedAt": "2026-07-23T07:55:00Z"
+    }
+  ],
+  "trades": [
+    { "id": "tr-1", "closedAt": "2026-07-23T08:15:00Z", "symbol": "BTCUSDT", "side": "LONG", "entryPrice": 65071.3, "exitPrice": 64857.0, "pnl": -2.34 },
+    { "id": "tr-2", "closedAt": "2026-07-22T09:40:00Z", "symbol": "SOLUSDT", "side": "LONG", "entryPrice": 78.3, "exitPrice": 77.1, "pnl": -1.72 },
+    { "id": "tr-3", "closedAt": "2026-07-21T04:06:00Z", "symbol": "BTCUSDT", "side": "LONG", "entryPrice": 63977.9, "exitPrice": 65898.5, "pnl": 5.6 }
+  ],
+  "insights": {
+    "vetoLog": [
+      { "id": "v-1", "timestamp": "2026-07-23T07:52:00Z", "symbol": "BTCUSDT", "side": "SELL", "status": "PROCEED", "reason": "Strong bearish momentum aligned with trend. Risk-reward favorable." },
+      { "id": "v-2", "timestamp": "2026-07-22T08:12:00Z", "symbol": "SOLUSDT", "side": "BUY", "status": "BLOCKED", "reason": "Overextended above Bollinger Band top. High risk of mean reversion." },
+      { "id": "v-3", "timestamp": "2026-07-21T03:48:00Z", "symbol": "BTCUSDT", "side": "BUY", "status": "PROCEED", "reason": "Pullback to key support with bullish divergence. Good entry zone." }
+    ],
+    "lessons": [
+      { "id": "l-1", "title": "Buying near Bollinger Band tops", "detail": "Repeated losses from entering long positions when price is overextended above the upper Bollinger Band.", "tags": ["chasing_up", "no_extension", "overextended_entry"] },
+      { "id": "l-2", "title": "Chasing pumps in low volume", "detail": "Entering during sharp price spikes on low volume leads to fakeouts and immediate reversals.", "tags": ["low_volume", "fakeout"] }
+    ]
+  },
+  "breakdown": {
+    "bySymbol": [
+      { "symbol": "SOLUSDT", "trades": 18, "winRate": 0.222, "netPnL": -16.15 },
+      { "symbol": "BTCUSDT", "trades": 9, "winRate": 0.222, "netPnL": -5.55 }
+    ],
+    "byRegime": [
+      { "regime": "Trending Up", "trades": 16, "winRate": 0.25 },
+      { "regime": "Trending Down", "trades": 8, "winRate": 0.125 },
+      { "regime": "Transitioning", "trades": 2, "winRate": 0.0 },
+      { "regime": "Ranging", "trades": 1, "winRate": 1.0 }
+    ]
+  }
+}

@@ -19,7 +19,7 @@ Status: Approved (approach approved via Q&A; design presented and accepted by pr
 
 ## Non-goals (deferred)
 
-- Real authentication, Basic auth, Keychain, biometrics — Phase 2, when API access exists.
+- Real server-side authentication (HTTP Basic auth validation against the dashboard) — Phase 2. **Amendment (user request, 2026-07-24):** a login screen (username/password, Keychain-backed session) IS in Phase 1 — it gates the app at launch but accepts any non-empty credentials until the real API is accessible.
 - Websockets — the backend is gunicorn/Flask; polling is the correct assumption until proven otherwise.
 - WidgetKit, App Intents, App Shortcuts, certificate pinning, SwiftData, SwiftLint CI, 90% coverage mandate.
 - Any backend creation or modification.

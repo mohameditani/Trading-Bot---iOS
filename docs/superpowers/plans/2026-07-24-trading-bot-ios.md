@@ -3569,7 +3569,367 @@ git add -A && git commit -m "feat: AI insights feed and breakdown analytics scre
 
 ---
 
-### Task 12: UI tests, launch check, README, final verification
+### Task 12: Login screen (username + password gate at launch)
+
+**Files:**
+- Create: `TradingBot/Core/Storage/KeychainStore.swift`
+- Create: `TradingBot/Features/Authentication/SessionController.swift`
+- Create: `TradingBot/Features/Authentication/LoginView.swift`
+- Modify: `TradingBot/Core/DI/AppContainer.swift`
+- Modify: `TradingBot/TradingBotApp.swift`
+- Test: `TradingBotTests/Authentication/SessionControllerTests.swift`
+
+**Interfaces:**
+- Consumes: `AppContainer` (Task 6), design system components (Task 2).
+- Produces:
+  - `final class KeychainStore: Sendable` with `func save(username: String, password: String) throws`, `func load() -> (username: String, password: String)?`, `func clear()`
+  - `@Observable @MainActor final class SessionController` with `private(set) var isAuthenticated: Bool`, `var errorMessage: String?`, `func login(username: String, password: String) async`, `func logout()`, `init(keychain: KeychainStore)` — restores session from Keychain on init
+  - `struct LoginView: View { init(session: SessionController) }` with accessibility identifiers `usernameField`, `passwordField`, `signInButton`, `loginError`
+  - `AppContainer` gains `let session: SessionController`
+  - **Phase 1 auth rule (explicit):** any non-empty username AND non-empty password is accepted, stored in Keychain, and the app proceeds. Real server validation (HTTP Basic auth against the dashboard) is Phase 2 — do not attempt network validation now.
+
+- [ ] **Step 1: Write the failing session tests**
+
+`TradingBotTests/Authentication/SessionControllerTests.swift`:
+
+```swift
+import Foundation
+import Testing
+@testable import TradingBot
+
+@Suite("SessionController")
+@MainActor
+struct SessionControllerTests {
+    private func makeSession() -> SessionController {
+        let keychain = KeychainStore(service: "com.tradingbot.ios.tests.\(UUID().uuidString)")
+        return SessionController(keychain: keychain)
+    }
+
+    @Test func startsLoggedOutWithoutStoredCredentials() {
+        #expect(makeSession().isAuthenticated == false)
+    }
+
+    @Test func loginWithNonEmptyCredentialsAuthenticates() async {
+        let session = makeSession()
+        await session.login(username: "demo", password: "secret")
+        #expect(session.isAuthenticated == true)
+        #expect(session.errorMessage == nil)
+    }
+
+    @Test func loginWithEmptyUsernameFails() async {
+        let session = makeSession()
+        await session.login(username: "", password: "secret")
+        #expect(session.isAuthenticated == false)
+        #expect(session.errorMessage != nil)
+    }
+
+    @Test func loginWithEmptyPasswordFails() async {
+        let session = makeSession()
+        await session.login(username: "demo", password: "  ")
+        #expect(session.isAuthenticated == false)
+    }
+
+    @Test func credentialsSurviveNewController() async {
+        let service = "com.tradingbot.ios.tests.\(UUID().uuidString)"
+        let keychain = KeychainStore(service: service)
+        let first = SessionController(keychain: keychain)
+        await first.login(username: "demo", password: "secret")
+        let second = SessionController(keychain: KeychainStore(service: service))
+        #expect(second.isAuthenticated == true)
+    }
+
+    @Test func logoutClearsSessionAndKeychain() async {
+        let service = "com.tradingbot.ios.tests.\(UUID().uuidString)"
+        let keychain = KeychainStore(service: service)
+        let session = SessionController(keychain: keychain)
+        await session.login(username: "demo", password: "secret")
+        session.logout()
+        #expect(session.isAuthenticated == false)
+        #expect(KeychainStore(service: service).load() == nil)
+    }
+}
+```
+
+- [ ] **Step 2: Run tests to verify they fail**
+
+```bash
+xcodebuild test -project TradingBot.xcodeproj -scheme TradingBot -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.6' CODE_SIGNING_ALLOWED=NO -only-testing:TradingBotTests/SessionControllerTests 2>&1 | tail -5
+```
+
+Expected: FAIL — cannot find `SessionController` / `KeychainStore`.
+
+- [ ] **Step 3: Implement KeychainStore**
+
+`TradingBot/Core/Storage/KeychainStore.swift`:
+
+```swift
+import Foundation
+import Security
+
+final class KeychainStore: Sendable {
+    enum KeychainError: Error {
+        case encodingFailed
+        case unexpectedStatus(OSStatus)
+    }
+
+    private let service: String
+
+    init(service: String = "com.tradingbot.ios") {
+        self.service = service
+    }
+
+    func save(username: String, password: String) throws {
+        let payload = "\(username)\n\(password)"
+        guard let data = payload.data(using: .utf8) else { throw KeychainError.encodingFailed }
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: "dashboard-credentials"
+        ]
+        SecItemDelete(query as CFDictionary)
+        var attributes = query
+        attributes[kSecValueData as String] = data
+        let status = SecItemAdd(attributes as CFDictionary, nil)
+        guard status == errSecSuccess else { throw KeychainError.unexpectedStatus(status) }
+    }
+
+    func load() -> (username: String, password: String)? {
+        var query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: "dashboard-credentials",
+            kSecReturnData as String: true
+        ]
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
+        var item: CFTypeRef?
+        guard SecItemCopyMatching(query as CFDictionary, &item) == errSecSuccess,
+              let data = item as? Data,
+              let payload = String(data: data, encoding: .utf8)
+        else { return nil }
+        let parts = payload.split(separator: "\n", maxSplits: 1).map(String.init)
+        guard parts.count == 2 else { return nil }
+        return (parts[0], parts[1])
+    }
+
+    func clear() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: "dashboard-credentials"
+        ]
+        SecItemDelete(query as CFDictionary)
+    }
+}
+```
+
+- [ ] **Step 4: Implement SessionController**
+
+`TradingBot/Features/Authentication/SessionController.swift`:
+
+```swift
+import Foundation
+import Observation
+
+@Observable
+@MainActor
+final class SessionController {
+    private(set) var isAuthenticated = false
+    var errorMessage: String?
+
+    private let keychain: KeychainStore
+
+    init(keychain: KeychainStore = KeychainStore()) {
+        self.keychain = keychain
+        self.isAuthenticated = keychain.load() != nil
+    }
+
+    func login(username: String, password: String) async {
+        let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedPassword = password.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedUsername.isEmpty, !trimmedPassword.isEmpty else {
+            errorMessage = "Enter both username and password."
+            return
+        }
+        // Phase 1: acceptance only. Server-side Basic auth validation is Phase 2.
+        do {
+            try keychain.save(username: trimmedUsername, password: password)
+            isAuthenticated = true
+            errorMessage = nil
+        } catch {
+            errorMessage = "Could not store credentials securely."
+        }
+    }
+
+    func logout() {
+        keychain.clear()
+        isAuthenticated = false
+    }
+}
+```
+
+- [ ] **Step 5: Run tests to verify they pass**
+
+```bash
+xcodebuild test -project TradingBot.xcodeproj -scheme TradingBot -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.6' CODE_SIGNING_ALLOWED=NO -only-testing:TradingBotTests/SessionControllerTests 2>&1 | tail -5
+```
+
+Expected: `** TEST SUCCEEDED **` (6 tests). Keychain access works in simulator-hosted tests without entitlements.
+
+- [ ] **Step 6: Implement LoginView**
+
+`TradingBot/Features/Authentication/LoginView.swift`:
+
+```swift
+import SwiftUI
+
+struct LoginView: View {
+    let session: SessionController
+    @State private var username = ""
+    @State private var password = ""
+    @FocusState private var focusedField: Field?
+
+    private enum Field {
+        case username, password
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 24) {
+                Spacer()
+
+                VStack(spacing: 8) {
+                    Image(systemName: "chart.line.uptrend.xyaxis.circle.fill")
+                        .font(.system(size: 56))
+                        .foregroundStyle(AppColors.pnlPositive)
+                    Text("Trading Bot")
+                        .font(.largeTitle.bold())
+                    Text("Sign in to your dashboard")
+                        .font(AppTypography.body)
+                        .foregroundStyle(.secondary)
+                }
+
+                CardView {
+                    VStack(spacing: 16) {
+                        TextField("Username", text: $username)
+                            .textContentType(.username)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .focused($focusedField, equals: .username)
+                            .accessibilityIdentifier("usernameField")
+                        Divider()
+                        SecureField("Password", text: $password)
+                            .textContentType(.password)
+                            .focused($focusedField, equals: .password)
+                            .accessibilityIdentifier("passwordField")
+                    }
+                }
+
+                if let error = session.errorMessage {
+                    Text(error)
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.pnlNegative)
+                        .accessibilityIdentifier("loginError")
+                }
+
+                Button {
+                    focusedField = nil
+                    Task { await session.login(username: username, password: password) }
+                } label: {
+                    Text("Sign In")
+                        .font(AppTypography.body.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(username.isEmpty || password.isEmpty)
+                .accessibilityIdentifier("signInButton")
+
+                Spacer()
+                Spacer()
+            }
+            .padding(24)
+            .background(AppColors.screenBackground)
+            .onSubmit {
+                focusedField = focusedField == .username ? .password : nil
+            }
+        }
+    }
+}
+```
+
+- [ ] **Step 7: Gate the app on authentication**
+
+Modify `TradingBot/Core/DI/AppContainer.swift` — add the session property (keep everything else):
+
+```swift
+@Observable
+@MainActor
+final class AppContainer {
+    let repository: SnapshotRepository
+    let store: SnapshotStore
+    let session: SessionController
+
+    init(configuration: AppConfiguration = AppConfiguration()) {
+        let provider: any BotDataProvider
+        if let baseURL = configuration.baseURL {
+            provider = RemoteBotDataProvider(baseURL: baseURL, client: HTTPClient())
+        } else {
+            provider = BundledBotDataProvider()
+        }
+        let repository = SnapshotRepository(provider: provider, cache: JSONCacheStore())
+        self.repository = repository
+        self.store = SnapshotStore(repository: repository)
+        self.session = SessionController()
+    }
+
+    /// Test seam: inject any repository.
+    init(repository: SnapshotRepository, session: SessionController? = nil) {
+        self.repository = repository
+        self.store = SnapshotStore(repository: repository)
+        self.session = session ?? SessionController()
+    }
+}
+```
+
+Modify `TradingBot/TradingBotApp.swift`:
+
+```swift
+import SwiftUI
+
+@main
+struct TradingBotApp: App {
+    @State private var container = AppContainer()
+
+    var body: some Scene {
+        WindowGroup {
+            if container.session.isAuthenticated {
+                MainTabView()
+                    .environment(container)
+            } else {
+                LoginView(session: container.session)
+            }
+        }
+    }
+}
+```
+
+- [ ] **Step 8: Build and run the full unit suite**
+
+```bash
+xcodebuild test -project TradingBot.xcodeproj -scheme TradingBot -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.6' CODE_SIGNING_ALLOWED=NO -only-testing:TradingBotTests 2>&1 | tail -3
+```
+
+Expected: `** TEST SUCCEEDED **`.
+
+- [ ] **Step 9: Commit**
+
+```bash
+git add -A && git commit -m "feat: login screen with keychain-backed session gate"
+```
+
+---
+
+### Task 13: UI tests, launch check, README, final verification
 
 **Files:**
 - Create: `TradingBotUITests/TradingBotUITests.swift`
@@ -3594,6 +3954,25 @@ final class TradingBotUITests: XCTestCase {
         continueAfterFailure = false
         app = XCUIApplication()
         app.launch()
+        signInIfNeeded()
+    }
+
+    /// The app is gated behind a login screen (Task 12). Phase 1 accepts any
+    /// non-empty credentials; the session persists in the simulator Keychain,
+    /// so this is a no-op once signed in.
+    private func signInIfNeeded() {
+        let usernameField = app.textFields["usernameField"]
+        guard usernameField.waitForExistence(timeout: 3) else { return }
+        usernameField.tap()
+        usernameField.typeText("demo")
+        app.secureTextFields["passwordField"].tap()
+        app.secureTextFields["passwordField"].typeText("demo")
+        app.buttons["signInButton"].tap()
+    }
+
+    func testLoginScreenAppearsAndAcceptsCredentials() {
+        // Fresh sign-in state was handled in setUp; reaching the dashboard proves login works.
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "totalEquity").firstMatch.waitForExistence(timeout: 5))
     }
 
     func testDashboardShowsTotalEquity() {
