@@ -6,8 +6,12 @@ struct TradingBotApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainTabView()
-                .environment(container)
+            if container.session.isAuthenticated {
+                MainTabView()
+                    .environment(container)
+            } else {
+                LoginView(session: container.session)
+            }
         }
     }
 }
