@@ -12,7 +12,7 @@ struct MainTabView: View {
                 PortfolioView(store: container.store)
             }
             Tab("Positions", systemImage: "square.stack.3d.up.fill") {
-                PlaceholderScreen(title: "Positions")
+                PositionsView(store: container.store)
             }
             Tab("History", systemImage: "clock.fill") {
                 PlaceholderScreen(title: "History")
