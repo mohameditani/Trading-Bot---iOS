@@ -9,7 +9,7 @@ struct MainTabView: View {
                 DashboardView(store: container.store)
             }
             Tab("Portfolio", systemImage: "chart.pie.fill") {
-                PlaceholderScreen(title: "Portfolio")
+                PortfolioView(store: container.store)
             }
             Tab("Positions", systemImage: "square.stack.3d.up.fill") {
                 PlaceholderScreen(title: "Positions")
