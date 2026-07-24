@@ -1,6 +1,6 @@
 import Foundation
 
-struct SnapshotDTO: Decodable {
+struct SnapshotDTO: Codable {
     let dashboard: DashboardDTO
     let portfolio: PortfolioDTO
     let positions: [PositionDTO]
@@ -8,7 +8,7 @@ struct SnapshotDTO: Decodable {
     let insights: InsightsDTO
     let breakdown: BreakdownDTO
 
-    struct DashboardDTO: Decodable {
+    struct DashboardDTO: Codable {
         let totalEquity: Double
         let balance: Double
         let winRate: Double
@@ -19,7 +19,7 @@ struct SnapshotDTO: Decodable {
         let equityCurve: [EquityPointDTO]
     }
 
-    struct PortfolioDTO: Decodable {
+    struct PortfolioDTO: Codable {
         let equityCurve: [EquityPointDTO]
         let high: Double
         let low: Double
@@ -28,12 +28,12 @@ struct SnapshotDTO: Decodable {
         let rangeEnd: Date
     }
 
-    struct EquityPointDTO: Decodable {
+    struct EquityPointDTO: Codable {
         let date: Date
         let equity: Double
     }
 
-    struct PositionDTO: Decodable {
+    struct PositionDTO: Codable {
         let id: String
         let symbol: String
         let side: String
@@ -48,7 +48,7 @@ struct SnapshotDTO: Decodable {
         let openedAt: Date
     }
 
-    struct TradeDTO: Decodable {
+    struct TradeDTO: Codable {
         let id: String
         let closedAt: Date
         let symbol: String
@@ -58,12 +58,12 @@ struct SnapshotDTO: Decodable {
         let pnl: Double
     }
 
-    struct InsightsDTO: Decodable {
+    struct InsightsDTO: Codable {
         let vetoLog: [VetoEntryDTO]
         let lessons: [LessonDTO]
     }
 
-    struct VetoEntryDTO: Decodable {
+    struct VetoEntryDTO: Codable {
         let id: String
         let timestamp: Date
         let symbol: String
@@ -72,26 +72,26 @@ struct SnapshotDTO: Decodable {
         let reason: String
     }
 
-    struct LessonDTO: Decodable {
+    struct LessonDTO: Codable {
         let id: String
         let title: String
         let detail: String
         let tags: [String]
     }
 
-    struct BreakdownDTO: Decodable {
+    struct BreakdownDTO: Codable {
         let bySymbol: [SymbolBreakdownDTO]
         let byRegime: [RegimeBreakdownDTO]
     }
 
-    struct SymbolBreakdownDTO: Decodable {
+    struct SymbolBreakdownDTO: Codable {
         let symbol: String
         let trades: Int
         let winRate: Double
         let netPnL: Double
     }
 
-    struct RegimeBreakdownDTO: Decodable {
+    struct RegimeBreakdownDTO: Codable {
         let regime: String
         let trades: Int
         let winRate: Double
