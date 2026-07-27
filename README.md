@@ -31,13 +31,16 @@ with no networking, no SwiftUI, and no fixtures beyond plain values.
 ## Running the tests
 
 ```bash
-# Fast: package units only (~114 tests)
+# Fast: package units only (116 tests)
 cd Packages/TradingBotKit && swift test
 
-# Everything, including UI tests
+# Everything: 57 cases — app ViewModels, accessibility, and 11 UI tests
 xcodebuild test -project TradingBot.xcodeproj -scheme TradingBot \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 ```
+
+Note that `xcodebuild` interleaves concurrent test output, so a `grep '^Test case'`
+tally can undercount. Trust `** TEST SUCCEEDED **` and the failure count.
 
 Formatters are locale- and timezone-pinned, which you can verify:
 
