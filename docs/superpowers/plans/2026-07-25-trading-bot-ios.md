@@ -1380,17 +1380,17 @@ import Testing
 
 @Test func dayIsMonthAndDayInUTC() {
     // 2026-06-20T00:00:00Z
-    #expect(BotFormat.day(Date(timeIntervalSince1970: 1_781_395_200)) == "Jun 20")
+    #expect(BotFormat.day(Date(timeIntervalSince1970: 1_781_913_600)) == "Jun 20")
 }
 
 @Test func stampIsMonthDayAndUTCClockTime() {
     // 2026-06-30T14:31:00Z
-    #expect(BotFormat.stamp(Date(timeIntervalSince1970: 1_782_268_260)) == "Jun 30 14:31")
+    #expect(BotFormat.stamp(Date(timeIntervalSince1970: 1_782_829_860)) == "Jun 30 14:31")
 }
 
 @Test func stampDoesNotShiftWithTheHostTimeZone() {
     // Same instant must render identically no matter where the machine is.
-    let instant = Date(timeIntervalSince1970: 1_782_268_260)
+    let instant = Date(timeIntervalSince1970: 1_782_829_860)
     #expect(BotFormat.stamp(instant) == "Jun 30 14:31")
     #expect(BotFormat.stamp(instant).hasPrefix("Jun 30"))
 }
@@ -1772,14 +1772,14 @@ import BotDomain
 
 @Test func decodesGeneratedAtAsAnISO8601Instant() throws {
     let snapshot = try SnapshotDecoder.decode(Fixtures.full)
-    #expect(snapshot.generatedAt == Date(timeIntervalSince1970: 1_782_271_365))
+    #expect(snapshot.generatedAt == Date(timeIntervalSince1970: 1_782_832_965))
 }
 
 @Test func decodesCurveDatesFromYearMonthDay() throws {
     let snapshot = try SnapshotDecoder.decode(Fixtures.full)
     #expect(snapshot.curve.count == 2)
     #expect(snapshot.curve[0].equity == 100.0)
-    #expect(snapshot.curve[0].date == Date(timeIntervalSince1970: 1_781_395_200))
+    #expect(snapshot.curve[0].date == Date(timeIntervalSince1970: 1_781_913_600))
 }
 
 @Test func decodesTheOpenPosition() throws {
