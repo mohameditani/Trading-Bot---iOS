@@ -2638,6 +2638,13 @@ import Testing
 
 private let testURL = URL(string: "https://example.test/api/snapshot")!
 
+/// Serialized: `MockURLProtocol` scripts responses through shared static state, and
+/// Swift Testing runs tests in parallel by default. Without this the queue and the
+/// request counter are clobbered across concurrent tests — the retry-count assertions
+/// see every test's requests summed together.
+@Suite(.serialized)
+struct HTTPClientTests {
+
 @Test func getReturnsBodyOnSuccess() async throws {
     MockURLProtocol.reset(with: [.ok(Fixtures.full)])
     let client = HTTPClient(session: MockURLProtocol.makeSession(), maxRetries: 0)
@@ -2719,7 +2726,11 @@ private let testURL = URL(string: "https://example.test/api/snapshot")!
         _ = try await provider.fetchPayload()
     }
 }
+
+}   // end @Suite(.serialized) struct HTTPClientTests
 ```
+
+Indent the eight `@Test` functions one level to sit inside the suite. Every test above must be a method of `HTTPClientTests`, not a free function.
 
 - [ ] **Step 3: Run to verify failure**
 
