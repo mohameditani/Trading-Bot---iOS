@@ -17,11 +17,10 @@ let package = Package(
         .target(name: "BotDomain"),
         .target(name: "BotFormatting", dependencies: ["BotDomain"]),
         .target(name: "BotDataKit", dependencies: ["BotDomain"]),
-        // No `resources:` yet — an empty resource bundle fails codesign with
-        // "bundle format unrecognized". Task 8 adds it alongside the real font files.
         .target(
             name: "BotDesignSystem",
-            dependencies: ["BotDomain", "BotFormatting"]
+            dependencies: ["BotDomain", "BotFormatting"],
+            resources: [.process("Resources")]
         ),
         .testTarget(name: "BotDomainTests", dependencies: ["BotDomain"]),
         .testTarget(name: "BotFormattingTests", dependencies: ["BotFormatting"]),

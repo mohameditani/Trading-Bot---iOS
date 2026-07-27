@@ -3312,21 +3312,35 @@ git commit -m "feat: snapshot repository with cache fallback and observable poll
 
 - [ ] **Step 1: Ask permission, then download the three families**
 
-After approval:
+The `fonts.google.com/download?family=` endpoint no longer returns a ZIP — it serves
+an HTML page. Fetch the files from the canonical `google/fonts` repository instead.
+
+Bodoni Moda and Plus Jakarta Sans ship as **variable** fonts (`[wght]` / `[opsz,wght]`
+in the filename); IBM Plex Mono ships as static faces. Both kinds register and resolve
+through the same family lookup, so no `static/` directory is needed.
+
+After approval, download straight into the package:
 
 ```bash
-cd /tmp
-curl -L -o bodoni.zip "https://fonts.google.com/download?family=Bodoni%20Moda"
-curl -L -o jakarta.zip "https://fonts.google.com/download?family=Plus%20Jakarta%20Sans"
-curl -L -o plexmono.zip "https://fonts.google.com/download?family=IBM%20Plex%20Mono"
-mkdir -p fontwork && cd fontwork
-unzip -o ../bodoni.zip -d bodoni >/dev/null
-unzip -o ../jakarta.zip -d jakarta >/dev/null
-unzip -o ../plexmono.zip -d plexmono >/dev/null
-find . -name "*.ttf" | sort
+D=Packages/TradingBotKit/Sources/BotDesignSystem/Resources/Fonts
+mkdir -p $D
+B=https://raw.githubusercontent.com/google/fonts/main
+curl -sL -o "$D/BodoniModa[opsz,wght].ttf"        "$B/ofl/bodonimoda/BodoniModa%5Bopsz,wght%5D.ttf"
+curl -sL -o "$D/BodoniModa-Italic[opsz,wght].ttf" "$B/ofl/bodonimoda/BodoniModa-Italic%5Bopsz,wght%5D.ttf"
+curl -sL -o "$D/PlusJakartaSans[wght].ttf"        "$B/ofl/plusjakartasans/PlusJakartaSans%5Bwght%5D.ttf"
+for w in Light Regular Medium SemiBold; do
+  curl -sL -o "$D/IBMPlexMono-$w.ttf" "$B/ofl/ibmplexmono/IBMPlexMono-$w.ttf"
+done
+curl -sL -o "$D/OFL-BodoniModa.txt"      "$B/ofl/bodonimoda/OFL.txt"
+curl -sL -o "$D/OFL-PlusJakartaSans.txt" "$B/ofl/plusjakartasans/OFL.txt"
+curl -sL -o "$D/OFL-IBMPlexMono.txt"     "$B/ofl/ibmplexmono/OFL.txt"
+file $D/*.ttf
+du -sh $D
 ```
 
-Expected: a list of `.ttf` paths. Families that ship variable fonts also include a `static/` directory — prefer those static files, they behave predictably with SwiftUI weight selection.
+Expected: every `.ttf` reports `TrueType Font data`, totalling ~1.1 MB. If any file
+reports `HTML document text`, the download failed — do not proceed, the bundle would
+ship broken fonts. The OFL licence files are required by the licence.
 
 - [ ] **Step 2: Create the resources directory and declare it in the manifest**
 
@@ -3357,40 +3371,13 @@ with:
 
 Declaring resources is what generates `Bundle.module`, which `BotFont.registerAll()` needs. Do this only once real `.ttf` files are in place — the directory must not be empty when you next build.
 
-- [ ] **Step 3: Copy the needed faces into the package**
-
-Copy only the weights the design uses — Bodoni Moda regular and italic, Plus Jakarta Sans light/regular/medium/semibold, IBM Plex Mono light/regular/medium/semibold:
+- [ ] **Step 3: Confirm the bundle contents**
 
 ```bash
-DEST="$OLDPWD/Packages/TradingBotKit/Sources/BotDesignSystem/Resources/Fonts"
-cd /tmp/fontwork
-find . -path "*static*" -name "BodoniModa*-Regular.ttf" -exec cp {} "$DEST/" \;
-find . -path "*static*" -name "BodoniModa*-Italic.ttf" -exec cp {} "$DEST/" \;
-find . -path "*static*" -name "PlusJakartaSans-Light.ttf" -exec cp {} "$DEST/" \;
-find . -path "*static*" -name "PlusJakartaSans-Regular.ttf" -exec cp {} "$DEST/" \;
-find . -path "*static*" -name "PlusJakartaSans-Medium.ttf" -exec cp {} "$DEST/" \;
-find . -path "*static*" -name "PlusJakartaSans-SemiBold.ttf" -exec cp {} "$DEST/" \;
-find . -name "IBMPlexMono-Light.ttf" -exec cp {} "$DEST/" \;
-find . -name "IBMPlexMono-Regular.ttf" -exec cp {} "$DEST/" \;
-find . -name "IBMPlexMono-Medium.ttf" -exec cp {} "$DEST/" \;
-find . -name "IBMPlexMono-SemiBold.ttf" -exec cp {} "$DEST/" \;
-ls -la "$DEST"
+ls Packages/TradingBotKit/Sources/BotDesignSystem/Resources/Fonts
 ```
 
-If a `find` matches nothing (naming varies between family releases), fall back to copying every `.ttf` from that family's `static/` directory, then delete the faces you do not need. Verify at least one file per family landed in `$DEST` before continuing.
-
-Also copy the licence files, which the OFL requires you to ship:
-
-```bash
-find /tmp/fontwork -iname "OFL.txt" -exec sh -c 'cp "$1" "$0/OFL-$(basename $(dirname $1)).txt"' "$DEST" {} \;
-ls "$DEST"
-```
-
-Remove the placeholder:
-
-```bash
-rm -f "$DEST/.gitkeep"
-```
+Expected: 7 `.ttf` files and 3 `OFL-*.txt` files, and no `.gitkeep`.
 
 - [ ] **Step 4: Write the failing font tests**
 
@@ -3596,26 +3583,36 @@ public enum BotFont {
         }
     }
 
-    #if canImport(UIKit)
+    /// Resolution goes through CoreText rather than `UIFont` so there is a single code
+    /// path: the package's own tests build for macOS, the app runs on iOS.
+    private static func faceNames(in family: String) -> [String] {
+        registerAll()
+        let attributes: [CFString: Any] = [kCTFontFamilyNameAttribute: family]
+        let descriptor = CTFontDescriptorCreateWithAttributes(attributes as CFDictionary)
+        let matches = CTFontDescriptorCreateMatchingFontDescriptors(descriptor, nil)
+            as? [CTFontDescriptor] ?? []
+        return matches.compactMap {
+            CTFontDescriptorCopyAttribute($0, kCTFontNameAttribute) as? String
+        }
+    }
+
     public static func isAvailable(_ family: String) -> Bool {
-        !UIFont.fontNames(forFamilyName: family).isEmpty
+        !faceNames(in: family).isEmpty
     }
 
     /// Finds a concrete face within a family, preferring an upright regular unless
     /// italic is requested.
     public static func postScriptName(family: String, italic: Bool) -> String? {
-        let names = UIFont.fontNames(forFamilyName: family)
+        let names = faceNames(in: family)
         guard !names.isEmpty else { return nil }
         if italic {
             return names.first { $0.localizedCaseInsensitiveContains("italic") } ?? names.first
         }
         let upright = names.filter { !$0.localizedCaseInsensitiveContains("italic") }
-        return upright.first { $0.localizedCaseInsensitiveContains("regular") } ?? upright.first ?? names.first
+        return upright.first { $0.localizedCaseInsensitiveContains("regular") }
+            ?? upright.first
+            ?? names.first
     }
-    #else
-    public static func isAvailable(_ family: String) -> Bool { true }
-    public static func postScriptName(family: String, italic: Bool) -> String? { family }
-    #endif
 
     // MARK: - Builders
 
