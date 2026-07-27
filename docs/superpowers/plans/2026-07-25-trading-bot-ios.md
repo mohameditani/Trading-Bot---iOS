@@ -2907,11 +2907,15 @@ final class StubSnapshotProvider: SnapshotProvider, @unchecked Sendable {
         self.init([.success(data)])
     }
 
+    /// Scoped `withLock` rather than lock()/unlock(): the bare calls are unavailable
+    /// from an async context because a suspension could strand the lock held.
     func fetchPayload() async throws -> Data {
-        lock.lock()
-        fetchCount += 1
-        let outcome = outcomes.count > 1 ? outcomes.removeFirst() : (outcomes.first ?? .failure(SnapshotError.offline))
-        lock.unlock()
+        let outcome = lock.withLock { () -> Outcome in
+            fetchCount += 1
+            return outcomes.count > 1
+                ? outcomes.removeFirst()
+                : (outcomes.first ?? .failure(SnapshotError.offline))
+        }
 
         switch outcome {
         case .success(let data): return data
@@ -2920,9 +2924,7 @@ final class StubSnapshotProvider: SnapshotProvider, @unchecked Sendable {
     }
 
     var callCount: Int {
-        lock.lock()
-        defer { lock.unlock() }
-        return fetchCount
+        lock.withLock { fetchCount }
     }
 }
 ```
@@ -3213,10 +3215,9 @@ public final class SnapshotStore {
         self.repository = repository
     }
 
-    deinit {
-        pollingTask?.cancel()
-        tickTask?.cancel()
-    }
+    // No `deinit` cancelling the tasks: under Swift 6 a deinit is nonisolated and
+    // cannot touch main-actor state. Both tasks instead re-acquire `self` weakly on
+    // every iteration, so they end on their own once the store is released.
 
     public func refresh() async {
         if state.value == nil { state = .loading }
@@ -3245,12 +3246,15 @@ public final class SnapshotStore {
     public func startPolling(interval: Duration = .seconds(30)) {
         stopPolling()
 
+        // `self` is re-bound weakly inside the loop, never hoisted above it: a single
+        // `guard let self` before the loop would hold a strong reference for the task's
+        // whole life and keep the store alive forever.
         pollingTask = Task { [weak self] in
-            guard let self else { return }
-            await self.refresh()
+            await self?.refresh()
             while !Task.isCancelled {
                 try? await Task.sleep(for: interval)
                 if Task.isCancelled { return }
+                guard let self else { return }
                 await self.refresh()
             }
         }
