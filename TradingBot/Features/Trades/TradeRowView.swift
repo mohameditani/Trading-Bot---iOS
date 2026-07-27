@@ -51,5 +51,8 @@ struct TradeRowView: View {
             "\(row.pair) \(row.directionLabel), \(row.outcomeIsWin ? "take profit" : "stop loss"), "
             + "\(row.pnlText), held \(row.holdText), \(row.regimeText)"
         )
+        // Lets UI tests count *trade rows* for a symbol without also matching the
+        // breakdown tables, which list every symbol regardless of the active filter.
+        .accessibilityIdentifier("trade.row")
     }
 }

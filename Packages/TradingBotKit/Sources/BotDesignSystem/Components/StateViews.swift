@@ -73,6 +73,7 @@ public struct ErrorStateView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(BotSpacing.screenHorizontal)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("state.error")
     }
 }

@@ -22,6 +22,10 @@ struct ReviewView: View {
             content
         }
         .background(BotColor.paper)
+        // `children: .contain` scopes the identifier to this container. Without it the
+        // identifier propagates onto every descendant and overrides theirs — the date
+        // text would answer to "screen.review" instead of "review.date".
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("screen.review")
     }
 

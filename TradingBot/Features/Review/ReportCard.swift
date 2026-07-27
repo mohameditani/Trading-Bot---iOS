@@ -34,6 +34,10 @@ struct ReportCard: View {
                 }
             }
         }
+        // `children: .contain` is what makes the card a queryable container. Without
+        // it SwiftUI attaches the identifier to no element at all and UI tests cannot
+        // find it, while the children stay individually accessible either way.
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("review.report")
     }
 

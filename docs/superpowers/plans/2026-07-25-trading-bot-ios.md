@@ -7075,7 +7075,13 @@ xcodebuild test -project TradingBot.xcodeproj -scheme TradingBot \
 
 Expected: **TEST SUCCEEDED** (11 UI tests).
 
-If an element is not found, confirm the identifier is on a queryable element. `accessibilityElement(children: .combine)` turns a container into `otherElements`, and a plain `Text` is a `staticTexts`. Adjust the query to match the element type rather than removing the assertion.
+**Two SwiftUI accessibility rules this task depends on — get them wrong and the tests fail for reasons unrelated to the app:**
+
+1. **An identifier on a plain container attaches to nothing, and leaks downward.** `.accessibilityIdentifier` on a `VStack` that is not itself an accessibility element propagates to every descendant *and overrides the identifiers they set*. A screen root marked `screen.review` will make its date label answer to `screen.review` instead of `review.date`. Always pair a container identifier with `.accessibilityElement(children: .contain)`, which scopes it to that container and leaves children addressable.
+
+2. **Never assert on the element *type*.** SwiftUI decides whether a view surfaces as `otherElements`, `staticTexts` or `buttons`, and that can change between OS releases. Query by identifier across `descendants(matching: .any)` — that is what the `XCUIApplication+Identifiers.swift` helper below exists for.
+
+Also note that the breakdown tables list every symbol regardless of the active row filter, which is correct. A symbol-filter test must scope its count to `trade.row`, or it will never reach zero.
 
 - [ ] **Step 6: Commit**
 

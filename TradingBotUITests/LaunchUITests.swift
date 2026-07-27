@@ -21,12 +21,12 @@ final class LaunchUITests: XCTestCase {
         XCTAssertTrue(app.buttons["tab.trades"].waitForExistence(timeout: 10))
 
         app.buttons["tab.trades"].tap()
-        XCTAssertTrue(app.staticTexts["screen.trades"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.exists(id: "screen.trades"))
 
         app.buttons["tab.review"].tap()
-        XCTAssertTrue(app.staticTexts["screen.review"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.exists(id: "screen.review"))
 
         app.buttons["tab.equity"].tap()
-        XCTAssertTrue(app.staticTexts["screen.equity"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.exists(id: "screen.equity"))
     }
 }

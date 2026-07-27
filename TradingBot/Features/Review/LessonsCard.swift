@@ -30,6 +30,7 @@ struct LessonsCard: View {
             RoundedRectangle(cornerRadius: BotRadius.card, style: .continuous)
                 .stroke(BotColor.hairline, lineWidth: 1)
         )
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("review.lessons")
     }
 

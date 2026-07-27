@@ -23,6 +23,9 @@ struct TradesView: View {
             content
         }
         .background(BotColor.paper)
+        // `children: .contain` scopes the identifier to this container. Without it the
+        // identifier propagates onto every descendant and overrides theirs.
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("screen.trades")
     }
 
@@ -145,6 +148,7 @@ struct TradesView: View {
                 BreakdownRowView(group: group, maxAbsolute: maxAbsolute)
             }
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("breakdown.\(identifier)")
     }
 }
