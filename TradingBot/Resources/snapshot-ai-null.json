@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-06-30T15:22:45Z",
+  "summary": {
+    "balance": 87.26, "equity": 116.40, "open": 1, "total": 28,
+    "wins": 11, "losses": 17, "win_rate": 39.3, "total_pnl": -12.74,
+    "today_total": 3, "today_wins": 1, "today_losses": 2, "today_pnl": -2.22
+  },
+  "curve": [
+    { "t": "2026-06-20", "equity": 100.00 },
+    { "t": "2026-06-23", "equity": 96.94 },
+    { "t": "2026-06-26", "equity": 101.50 },
+    { "t": "2026-06-28", "equity": 89.25 },
+    { "t": "2026-06-30", "equity": 87.26 }
+  ],
+  "open_positions": [
+    {
+      "pair": "SOLUSDT", "direction": "short", "entry_price": 73.10, "quantity": 0.8,
+      "leverage": 2, "margin": 29.24, "take_profit": 70.91, "stop_loss": 74.20,
+      "timestamp": "2026-06-30T14:00:00Z", "exchange_stops": true
+    }
+  ],
+  "closed_trades": [
+    { "closed_at": "2026-06-30T14:31:00Z", "pair": "SOLUSDT", "direction": "short", "entry_price": 72.95, "exit_price": 71.85, "quantity": 1.2, "pnl": -1.99, "status": "closed_sl", "regime": "ranging", "confidence": 7, "timestamp": "2026-06-30T12:05:00Z" },
+    { "closed_at": "2026-06-30T13:10:00Z", "pair": "BTCUSDT", "direction": "short", "entry_price": 58800.0, "exit_price": 58288.8, "quantity": 0.001, "pnl": 1.76, "status": "closed_tp", "regime": "trending_down", "confidence": 8, "timestamp": "2026-06-30T10:40:00Z" }
+  ],
+  "by_symbol": [
+    { "key": "BTCUSDT", "trades": 14, "win_rate": 50.0, "net_pnl": 6.10 },
+    { "key": "SOLUSDT", "trades": 14, "win_rate": 28.6, "net_pnl": -18.84 }
+  ],
+  "by_regime": [
+    { "key": "trending_up", "trades": 6, "win_rate": 66.7, "net_pnl": 8.20 },
+    { "key": "ranging", "trades": 13, "win_rate": 23.1, "net_pnl": -22.99 }
+  ],
+  "ai_report": null,
+  "veto": null,
+  "lessons": null
+}

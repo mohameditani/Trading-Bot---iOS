@@ -4850,14 +4850,17 @@ final class AppContainer {
     }
 
     /// Reads `-fixture <name>` from launch arguments. Returns nil when absent.
-    static func fixtureName(from arguments: [String]) -> String? {
+    ///
+    /// `nonisolated` because argument parsing is pure — it would otherwise inherit the
+    /// class's `@MainActor` and be unusable from a synchronous test.
+    nonisolated static func fixtureName(from arguments: [String]) -> String? {
         guard let index = arguments.firstIndex(of: "-fixture"),
               arguments.index(after: index) < arguments.endIndex
         else { return nil }
         return arguments[arguments.index(after: index)]
     }
 
-    static func resourceName(for fixture: String?) -> String {
+    nonisolated static func resourceName(for fixture: String?) -> String {
         switch fixture {
         case "aiNull": return "snapshot-ai-null"
         case "empty": return "snapshot-empty"

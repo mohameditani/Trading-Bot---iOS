@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-06-30T15:22:45Z",
+  "summary": {
+    "balance": 100.00, "equity": 100.00, "open": 0, "total": 0,
+    "wins": 0, "losses": 0, "win_rate": 0.0, "total_pnl": 0.0,
+    "today_total": 0, "today_wins": 0, "today_losses": 0, "today_pnl": 0.0
+  },
+  "curve": [],
+  "open_positions": [],
+  "closed_trades": [],
+  "by_symbol": [],
+  "by_regime": [],
+  "ai_report": null,
+  "veto": null,
+  "lessons": null
+}
