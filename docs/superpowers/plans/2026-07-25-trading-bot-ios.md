@@ -259,7 +259,10 @@ import PackageDescription
 
 let package = Package(
     name: "TradingBotKit",
-    platforms: [.iOS(.v18)],
+    // iOS 18 is the app's deployment target. macOS 14 is declared only so `swift test`
+    // can build these modules natively for the fast inner loop — SwiftUI, Observation
+    // and Charts are all unavailable below it, and the app itself never ships on macOS.
+    platforms: [.iOS(.v18), .macOS(.v14)],
     products: [
         .library(name: "BotDomain", targets: ["BotDomain"]),
         .library(name: "BotFormatting", targets: ["BotFormatting"]),
@@ -270,10 +273,11 @@ let package = Package(
         .target(name: "BotDomain"),
         .target(name: "BotFormatting", dependencies: ["BotDomain"]),
         .target(name: "BotDataKit", dependencies: ["BotDomain"]),
+        // No `resources:` yet — an empty resource bundle fails codesign with
+        // "bundle format unrecognized". Task 8 adds it alongside the real font files.
         .target(
             name: "BotDesignSystem",
-            dependencies: ["BotDomain", "BotFormatting"],
-            resources: [.process("Resources")]
+            dependencies: ["BotDomain", "BotFormatting"]
         ),
         .testTarget(name: "BotDomainTests", dependencies: ["BotDomain"]),
         .testTarget(name: "BotFormattingTests", dependencies: ["BotFormatting"]),
@@ -347,12 +351,7 @@ public enum BotColor {
 }
 ```
 
-Create the empty resources directory so `.process("Resources")` resolves:
-
-```bash
-mkdir -p Packages/TradingBotKit/Sources/BotDesignSystem/Resources/Fonts
-touch Packages/TradingBotKit/Sources/BotDesignSystem/Resources/Fonts/.gitkeep
-```
+Do **not** create a `Resources` directory yet. SwiftPM builds a resource bundle for any target declaring `resources:`, and an empty one fails codesign with `bundle format unrecognized, invalid, or unsuitable`. Task 8 creates the directory, adds the fonts, and declares the resources together.
 
 - [ ] **Step 8: Write the package linkage test**
 
@@ -1886,7 +1885,7 @@ import BotDomain
 }
 ```
 
-- [ ] **Step 4: Run to verify failure**
+- [ ] **Step 5: Run to verify failure**
 
 ```bash
 cd Packages/TradingBotKit && swift test --filter SnapshotMapperTests
@@ -3310,7 +3309,36 @@ find . -name "*.ttf" | sort
 
 Expected: a list of `.ttf` paths. Families that ship variable fonts also include a `static/` directory — prefer those static files, they behave predictably with SwiftUI weight selection.
 
-- [ ] **Step 2: Copy the needed faces into the package**
+- [ ] **Step 2: Create the resources directory and declare it in the manifest**
+
+```bash
+mkdir -p Packages/TradingBotKit/Sources/BotDesignSystem/Resources/Fonts
+```
+
+In `Packages/TradingBotKit/Package.swift`, replace:
+
+```swift
+        // No `resources:` yet — an empty resource bundle fails codesign with
+        // "bundle format unrecognized". Task 8 adds it alongside the real font files.
+        .target(
+            name: "BotDesignSystem",
+            dependencies: ["BotDomain", "BotFormatting"]
+        ),
+```
+
+with:
+
+```swift
+        .target(
+            name: "BotDesignSystem",
+            dependencies: ["BotDomain", "BotFormatting"],
+            resources: [.process("Resources")]
+        ),
+```
+
+Declaring resources is what generates `Bundle.module`, which `BotFont.registerAll()` needs. Do this only once real `.ttf` files are in place — the directory must not be empty when you next build.
+
+- [ ] **Step 3: Copy the needed faces into the package**
 
 Copy only the weights the design uses — Bodoni Moda regular and italic, Plus Jakarta Sans light/regular/medium/semibold, IBM Plex Mono light/regular/medium/semibold:
 
@@ -3345,7 +3373,7 @@ Remove the placeholder:
 rm -f "$DEST/.gitkeep"
 ```
 
-- [ ] **Step 3: Write the failing font tests**
+- [ ] **Step 4: Write the failing font tests**
 
 `Packages/TradingBotKit/Tests/BotDesignSystemTests/BotFontTests.swift`:
 
@@ -3421,7 +3449,7 @@ import SwiftUI
 }
 ```
 
-- [ ] **Step 4: Run to verify failure**
+- [ ] **Step 5: Run to verify failure**
 
 ```bash
 cd Packages/TradingBotKit && swift test --filter BotDesignSystemTests
@@ -3429,7 +3457,7 @@ cd Packages/TradingBotKit && swift test --filter BotDesignSystemTests
 
 Expected: FAIL — `cannot find 'BotFont' in scope`.
 
-- [ ] **Step 5: Write the colour tokens**
+- [ ] **Step 6: Write the colour tokens**
 
 Replace `Packages/TradingBotKit/Sources/BotDesignSystem/Tokens/BotColor.swift`:
 
@@ -3507,7 +3535,7 @@ extension Color {
 }
 ```
 
-- [ ] **Step 6: Write the font tokens**
+- [ ] **Step 7: Write the font tokens**
 
 `Packages/TradingBotKit/Sources/BotDesignSystem/Tokens/BotFont.swift`:
 
@@ -3624,7 +3652,7 @@ public enum BotFont {
 }
 ```
 
-- [ ] **Step 7: Write the spacing tokens**
+- [ ] **Step 8: Write the spacing tokens**
 
 `Packages/TradingBotKit/Sources/BotDesignSystem/Tokens/BotSpacing.swift`:
 
@@ -3651,7 +3679,7 @@ public enum BotRadius {
 }
 ```
 
-- [ ] **Step 8: Run to verify pass**
+- [ ] **Step 9: Run to verify pass**
 
 ```bash
 cd Packages/TradingBotKit && swift test --filter BotDesignSystemTests
@@ -3663,7 +3691,7 @@ Expected: PASS (8 tests). If `registrationMakesEveryFamilyAvailable` fails, the 
 cd Packages/TradingBotKit && swift test --filter registrationMakesEveryFamilyAvailable 2>&1 | head -30
 ```
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
 git add Packages/TradingBotKit
@@ -4092,7 +4120,7 @@ public struct ProgressBar: View {
 }
 ```
 
-- [ ] **Step 8: Run to verify pass**
+- [ ] **Step 9: Run to verify pass**
 
 ```bash
 cd Packages/TradingBotKit && swift test --filter BotDesignSystemTests
@@ -4100,7 +4128,7 @@ cd Packages/TradingBotKit && swift test --filter BotDesignSystemTests
 
 Expected: PASS (16 tests).
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
 git add Packages/TradingBotKit
@@ -5589,7 +5617,7 @@ xcodebuild test -project TradingBot.xcodeproj -scheme TradingBot \
 
 Expected: **TEST SUCCEEDED**.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
 git add TradingBot TradingBotTests
