@@ -167,8 +167,10 @@ Tabs: **EQUITY** (chart icon), **TRADES** (lines icon), **REVIEW** (star icon). 
 The design hardcodes the rail marker at `left:64%`. This spec computes it. The rail is always drawn take-profit (green) on the left to stop-loss (red) on the right, whichever side of the entry those prices sit on, so one direction-agnostic formula covers both long and short:
 
 ```
-marker = |entry − TP| / |SL − TP|        clamped to 0…1
+marker = (entry − TP) / (SL − TP)        clamped to 0…1
 ```
+
+The ratio is **signed, not absolute**. For a short the span is positive and for a long it is negative, and dividing by it normalises both onto the same axis. Using `|entry − TP|` instead looks equivalent but is wrong: an entry beyond take-profit — a deeply winning position — would land at the stop-loss end of the rail. This is covered by a regression test in both directions.
 
 For the sample short (TP 70.91, entry 73.10, SL 74.20) that gives 66.6%, close to the design's hand-placed 64%. When `SL == TP` the denominator is zero and the marker defaults to 0.5. Computing it is correct — a hardcoded marker would misrepresent every other position.
 

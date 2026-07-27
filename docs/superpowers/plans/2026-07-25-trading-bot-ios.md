@@ -866,11 +866,15 @@ extension Position {
     /// The rail always runs take-profit (left, green) to stop-loss (right, red)
     /// regardless of direction, so one formula covers both long and short.
     /// The design hardcodes 64%; this computes it so every position renders truthfully.
+    ///
+    /// The ratio is signed, not absolute: for a short the span is positive and for a
+    /// long it is negative, and dividing by it normalises both to the same 0...1 axis.
+    /// Taking `abs` of the numerator instead would place an entry *beyond* take-profit —
+    /// a deeply winning position — at the stop-loss end of the rail.
     public var railProgress: Double {
-        let span = abs(stopLoss - takeProfit)
-        guard span > 0 else { return 0.5 }
-        let offset = abs(entryPrice - takeProfit)
-        return min(max(offset / span, 0), 1)
+        let span = stopLoss - takeProfit
+        guard span != 0 else { return 0.5 }
+        return min(max((entryPrice - takeProfit) / span, 0), 1)
     }
 }
 

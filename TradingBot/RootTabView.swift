@@ -9,7 +9,7 @@ struct RootTabView: View {
     var body: some View {
         ZStack {
             BotColor.paper.ignoresSafeArea()
-            Text(BotDomainInfo.moduleName)
+            Text("Trading Bot")
                 .accessibilityIdentifier("root.placeholder")
         }
     }
