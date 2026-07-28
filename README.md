@@ -19,7 +19,7 @@ The design spec and implementation plan live in `docs/superpowers/`.
 | `Packages/TradingBotKit/Sources/BotDomain` | Models and pure logic. No dependencies. |
 | `Packages/TradingBotKit/Sources/BotFormatting` | Display formatting, pinned to `en_US_POSIX` / UTC. |
 | `Packages/TradingBotKit/Sources/BotDataKit` | Provider, DTOs, HTTP, cache, polling store. |
-| `Packages/TradingBotKit/Sources/BotDesignSystem` | Tokens, fonts, reusable components. |
+| `Packages/TradingBotKit/Sources/BotDesignSystem` | Tokens, typography, reusable components. |
 | `TradingBot/` | App shell and one View + ViewModel per tab. |
 
 Views contain no formatting and no business logic — ViewModels expose view-ready
@@ -31,7 +31,7 @@ with no networking, no SwiftUI, and no fixtures beyond plain values.
 ## Running the tests
 
 ```bash
-# Fast: package units only (156 tests)
+# Fast: package units only (154 tests)
 cd Packages/TradingBotKit && swift test
 
 # Everything: 57 cases — app ViewModels, accessibility, and 11 UI tests
@@ -136,13 +136,17 @@ stops producing writes — so it reports the gap and leaves the judgement to you
 
 ## Fonts
 
-Bodoni Moda, Plus Jakarta Sans, and IBM Plex Mono ship in the design-system package
-under the SIL Open Font License; their licence files sit alongside them in
-`Packages/TradingBotKit/Sources/BotDesignSystem/Resources/Fonts/`.
+The system font, matching RentRoll: SF Pro for interface text and SF Mono
+(`design: .monospaced`) for every figure, so columns of numbers align.
 
-Bodoni Moda and Plus Jakarta Sans are variable fonts; IBM Plex Mono ships as static
-faces. `BotFont` resolves both through CoreText family lookup, so the exact file naming
-of a Google Fonts release does not matter.
+An earlier version bundled Bodoni Moda, Plus Jakarta Sans and IBM Plex Mono to
+reproduce the mockup's editorial look. Those were dropped — the point sizes are
+unchanged, so layout is identical and only the typeface differs, and the app no longer
+carries ~1.1 MB of font files or a runtime registration step.
+
+The palette is a fixed light scheme with no dark variants, so the app pins
+`.preferredColorScheme(.light)`. Without it a device in dark mode mixes the hardcoded
+light colours with dark system chrome.
 
 ## Related branches
 

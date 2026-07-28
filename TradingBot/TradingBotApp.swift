@@ -5,14 +5,14 @@ import BotDesignSystem
 struct TradingBotApp: App {
     @State private var container = AppContainer()
 
-    init() {
-        // Custom faces ship in the package bundle, so they need runtime registration.
-        BotFont.registerAll()
-    }
-
     var body: some Scene {
         WindowGroup {
             RootTabView(store: container.store)
+                // The palette is a fixed light editorial scheme — every colour is a
+                // hardcoded hex with no dark variant. Without this, a device in dark
+                // mode mixes those light colours with dark system-adaptive chrome and
+                // the result is neither scheme.
+                .preferredColorScheme(.light)
         }
     }
 }

@@ -101,7 +101,13 @@ private func makeCache() -> SnapshotCache {
     store.startPolling(interval: .milliseconds(20))
     try? await Task.sleep(for: .milliseconds(120))
     store.stopPolling()
+
+    // A refresh already in flight when stopPolling() lands still completes, so let it
+    // settle before sampling. The claim under test is that no *new* fetch starts —
+    // sampling immediately made this flaky (it caught the in-flight one landing late).
+    try? await Task.sleep(for: .milliseconds(80))
     let countAfterStop = provider.callCount
-    try? await Task.sleep(for: .milliseconds(120))
+
+    try? await Task.sleep(for: .milliseconds(200))
     #expect(provider.callCount == countAfterStop)
 }

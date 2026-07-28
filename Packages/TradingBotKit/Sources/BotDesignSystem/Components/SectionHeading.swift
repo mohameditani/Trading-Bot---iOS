@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// A Bodoni section title with an optional mono counter beside it.
+/// A section title with an optional mono counter beside it.
 public struct SectionHeading: View {
     public let title: String
     public let trailing: String?

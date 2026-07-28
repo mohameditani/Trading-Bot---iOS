@@ -53,7 +53,11 @@ public struct BotTabBar: View {
         .padding(.top, 9)
         .padding(.horizontal, 12)
         .padding(.bottom, 8)
-        .background(.regularMaterial)
+        // Explicit paper, not `.regularMaterial`. Material is the one colour-scheme
+        // adaptive thing in this app: on a device in dark mode it renders near-black
+        // while every other colour here is a fixed light hex, so the bar looked like a
+        // black slab under an otherwise cream UI.
+        .background(BotColor.paper)
         .overlay(alignment: .top) {
             Rectangle().fill(BotColor.hairline).frame(height: 1)
         }

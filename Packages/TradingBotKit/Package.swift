@@ -19,8 +19,9 @@ let package = Package(
         .target(name: "BotDataKit", dependencies: ["BotDomain"]),
         .target(
             name: "BotDesignSystem",
-            dependencies: ["BotDomain", "BotFormatting"],
-            resources: [.process("Resources")]
+            // No resources: the design system uses the system font, so there are no
+            // bundled font files to ship.
+            dependencies: ["BotDomain", "BotFormatting"]
         ),
         .testTarget(name: "BotDomainTests", dependencies: ["BotDomain"]),
         .testTarget(name: "BotFormattingTests", dependencies: ["BotFormatting"]),
