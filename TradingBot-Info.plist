@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Base Info.plist. GENERATE_INFOPLIST_FILE stays YES, so Xcode merges its generated
+  keys (bundle name, launch screen, supported orientations) on top of this file.
+  The only thing declared here is the ATS exception.
+
+  Why this is needed: the bot's dashboard uses a self-signed certificate. App Transport
+  Security refuses such a connection *before* URLSession ever consults our delegate, so
+  certificate pinning alone cannot work on iOS — the handshake fails with a TLS error.
+  (It succeeds under `swift test` on macOS, where ATS does not apply, which is why the
+  package suite passes while the app fails.)
+
+  NSExceptionAllowsInsecureHTTPLoads hands trust evaluation for this ONE host to the
+  app. That is not a weakening here: CertificatePinner then accepts exactly one
+  certificate fingerprint, which is stricter than ordinary CA trust — a valid
+  CA-signed certificate for this address would still be rejected.
+
+  Scoped deliberately to the single IP. There is no NSAllowsArbitraryLoads, so every
+  other host keeps full ATS enforcement.
+-->
+<plist version="1.0">
+<dict>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>165.227.151.108</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<false/>
+			</dict>
+		</dict>
+	</dict>
+</dict>
+</plist>
