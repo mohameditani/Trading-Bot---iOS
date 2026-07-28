@@ -67,4 +67,32 @@ import BotDataKit
     #expect(config.pinnedFingerprints == ["aaaa", "bbbb"])
 }
 
+// MARK: - The unit-test network guard
+//
+// A developer machine with a filled-in dashboard-config.json would otherwise point the
+// whole suite at the production bot: every ViewModel test would assert against live
+// trades and fail, and each run would spend attempts against the dashboard's 10-strike
+// per-IP lockout. This test exists so the guard cannot be quietly removed.
+
+@Test func aUnitTestHostIsDetected() {
+    #expect(AppContainer.isRunningUnitTests)
+}
+
+@MainActor
+@Test func aUnitTestHostNeverGoesLiveEvenWhenFullyConfigured() async {
+    let container = AppContainer(
+        arguments: [],
+        configuration: AppConfiguration(
+            baseURL: URL(string: "https://165.227.151.108:8443"),
+            credentials: BasicCredentials(username: "admin", password: "real"),
+            pinnedFingerprints: ["deadbeef"]
+        )
+    )
+    #expect(container.isLive == false)
+
+    // And it still serves the bundled snapshot rather than failing.
+    await container.store.refresh()
+    #expect(container.store.state.value?.summary.total == 28)
+}
+
 private final class ConfigProbe {}

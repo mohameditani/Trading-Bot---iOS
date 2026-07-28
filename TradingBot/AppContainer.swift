@@ -25,9 +25,14 @@ final class AppContainer {
     ) {
         let fixture = Self.fixtureName(from: arguments)
 
-        // A fixture always wins: UI tests must never reach the network, whatever the
-        // build happens to be configured with.
-        let useLive = fixture == nil && configuration.isLiveConfigured
+        // Two independent guards, because a developer machine with a filled-in
+        // dashboard-config.json would otherwise silently point the whole test suite at
+        // the production bot:
+        //   * a `-fixture` argument always wins (UI tests),
+        //   * and a unit-test host never goes live at all, whatever is configured.
+        let useLive = fixture == nil
+            && configuration.isLiveConfigured
+            && !Self.isRunningUnitTests
         self.isLive = useLive
 
         let provider: any SnapshotProvider
@@ -84,6 +89,14 @@ final class AppContainer {
         case "empty": return "snapshot-empty"
         default: return "snapshot"
         }
+    }
+
+    /// True when the app is hosting a unit-test bundle.
+    ///
+    /// UI tests launch the app as a normal process without this variable, and they
+    /// always pass `-fixture`, so they are covered by the fixture rule instead.
+    nonisolated static var isRunningUnitTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
 
     /// Pinned session when fingerprints are configured, default session otherwise.
