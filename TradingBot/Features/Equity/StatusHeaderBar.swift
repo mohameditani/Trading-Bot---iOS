@@ -4,15 +4,23 @@ import BotDesignSystem
 /// Live dot, bot identity, exchange, freshness, refresh affordance.
 struct StatusHeaderBar: View {
     let freshnessText: String
+    let botActivityText: String
+    let isBotActivityOverdue: Bool
     let refresh: () async -> Void
+
+    /// The dot reflects the *bot's* health, not the fetch's. A green dot beside a
+    /// stale ledger would be a lie.
+    private var statusColor: Color {
+        isBotActivityOverdue ? BotColor.negative : BotColor.positive
+    }
 
     var body: some View {
         HStack(spacing: 9) {
             Circle()
-                .fill(BotColor.positive)
+                .fill(statusColor)
                 .frame(width: 7, height: 7)
                 .overlay(
-                    Circle().stroke(BotColor.positive.opacity(0.15), lineWidth: 3)
+                    Circle().stroke(statusColor.opacity(0.15), lineWidth: 3)
                 )
                 .accessibilityHidden(true)
 
@@ -25,6 +33,17 @@ struct StatusHeaderBar: View {
                 .foregroundStyle(BotColor.greyMuted)
 
             Spacer(minLength: 0)
+
+            Text(botActivityText)
+                .font(BotFont.badge)
+                .foregroundStyle(isBotActivityOverdue ? BotColor.negative : BotColor.greyMuted)
+                .lineLimit(1)
+                .accessibilityLabel(
+                    isBotActivityOverdue
+                        ? "Bot may have stopped — \(botActivityText)"
+                        : botActivityText
+                )
+                .accessibilityIdentifier("header.botActivity")
 
             Text(freshnessText)
                 .font(BotFont.metadataMono)

@@ -13,6 +13,11 @@ public struct Snapshot: Equatable, Sendable {
     public let aiReport: AIReport?
     public let veto: VetoLog?
     public let lessons: [Lesson]
+    /// The bot's newest ledger write — its own heartbeat, distinct from how recently
+    /// we fetched. Nil when the bot has never traded.
+    public let lastActivity: Date?
+    /// The bot's `MAX_HOLD_HOURS`; the window after which it force-closes a position.
+    public let maxHoldHours: Double
 
     public init(
         generatedAt: Date,
@@ -24,8 +29,12 @@ public struct Snapshot: Equatable, Sendable {
         byRegime: [BreakdownGroup],
         aiReport: AIReport?,
         veto: VetoLog?,
-        lessons: [Lesson]
+        lessons: [Lesson],
+        lastActivity: Date? = nil,
+        maxHoldHours: Double = 72
     ) {
+        self.lastActivity = lastActivity
+        self.maxHoldHours = maxHoldHours
         self.generatedAt = generatedAt
         self.summary = summary
         self.curve = curve
@@ -40,6 +49,15 @@ public struct Snapshot: Equatable, Sendable {
 
     /// True when the review layer has something to show.
     public var hasReviewLayer: Bool { aiReport != nil }
+
+    /// How stale the bot's own ledger is, judged against its max-hold window.
+    public func activityStatus(now: Date) -> BotActivityStatus {
+        BotActivity.status(
+            lastActivity: lastActivity,
+            now: now,
+            maxHoldHours: maxHoldHours
+        )
+    }
 }
 
 public struct Summary: Equatable, Sendable {

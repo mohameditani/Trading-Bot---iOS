@@ -1,0 +1,21 @@
+{
+  "_comment": [
+    "Copy this file to `dashboard-config.json` in the same folder and fill it in.",
+    "That filename is gitignored, so your password never enters the repository.",
+    "",
+    "With the file absent — or any of baseURL/username/password left blank — the app",
+    "stays on its bundled sample snapshot and behaves exactly as it does today.",
+    "",
+    "Read the certificate fingerprint off the live server with:",
+    "  echo | openssl s_client -connect 165.227.151.108:8443 2>/dev/null \\",
+    "    | openssl x509 -outform DER | shasum -a 256"
+  ],
+
+  "baseURL": "https://165.227.151.108:8443",
+  "username": "admin",
+  "password": "",
+
+  "certificateSHA256": [
+    "a2aaa94711bd3b2a9ab74963967d0fa84c5cbb9bdd65d4da8d1ebf3119dcf1a9"
+  ]
+}

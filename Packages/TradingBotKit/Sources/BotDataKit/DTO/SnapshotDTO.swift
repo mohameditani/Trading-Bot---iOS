@@ -13,6 +13,10 @@ struct SnapshotDTO: Decodable {
     let aiReport: AIReportDTO?
     let veto: VetoDTO?
     let lessons: [LessonDTO]?
+    /// The bot's newest ledger write. Absent from older payloads, nil when it has
+    /// never traded.
+    let lastActivity: Date?
+    let maxHoldHours: Double?
 
     enum CodingKeys: String, CodingKey {
         case generatedAt = "generated_at"
@@ -22,6 +26,8 @@ struct SnapshotDTO: Decodable {
         case bySymbol = "by_symbol"
         case byRegime = "by_regime"
         case aiReport = "ai_report"
+        case lastActivity = "last_activity"
+        case maxHoldHours = "max_hold_hours"
     }
 }
 

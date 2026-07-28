@@ -11,7 +11,11 @@ struct EquityView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            StatusHeaderBar(freshnessText: viewModel.freshnessText) {
+            StatusHeaderBar(
+                freshnessText: viewModel.freshnessText,
+                botActivityText: viewModel.botActivityText,
+                isBotActivityOverdue: viewModel.isBotActivityOverdue
+            ) {
                 await viewModel.refresh()
             }
 

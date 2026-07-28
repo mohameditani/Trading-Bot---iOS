@@ -50,6 +50,28 @@ final class EquityViewModel {
 
     var freshnessText: String { BotFormat.freshness(seconds: store.secondsSinceUpdate) }
 
+    // MARK: - Bot heartbeat
+    //
+    // Distinct from `freshnessText`, which only says how recently *we* fetched. The
+    // dashboard keeps serving its last payload after the bot stops, so fetch freshness
+    // alone would show "just now" for a bot that died days ago.
+
+    private var activityStatus: BotActivityStatus {
+        snapshot?.activityStatus(now: Date()) ?? .unknown
+    }
+
+    var botActivityText: String {
+        switch activityStatus {
+        case .unknown:
+            return "no trades yet"
+        case .recent(let elapsed), .overdue(let elapsed):
+            return "last trade \(BotFormat.duration(elapsed)) ago"
+        }
+    }
+
+    /// True when the bot has written nothing for longer than its own max-hold window.
+    var isBotActivityOverdue: Bool { activityStatus.isOverdue }
+
     // MARK: - Hero
 
     var equityFigure: String { BotFormat.currency(snapshot?.summary.equity ?? 0) }

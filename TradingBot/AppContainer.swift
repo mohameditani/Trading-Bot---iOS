@@ -16,15 +16,39 @@ private struct FailingSnapshotProvider: SnapshotProvider {
 @MainActor
 final class AppContainer {
     let store: SnapshotStore
+    /// True when the app is talking to the real dashboard rather than bundled JSON.
+    let isLive: Bool
 
-    init(arguments: [String] = ProcessInfo.processInfo.arguments) {
+    init(
+        arguments: [String] = ProcessInfo.processInfo.arguments,
+        configuration: AppConfiguration = .fromBundle()
+    ) {
         let fixture = Self.fixtureName(from: arguments)
-        let provider: any SnapshotProvider = fixture == "error"
-            ? FailingSnapshotProvider()
-            : BundledSnapshotProvider(
+
+        // A fixture always wins: UI tests must never reach the network, whatever the
+        // build happens to be configured with.
+        let useLive = fixture == nil && configuration.isLiveConfigured
+        self.isLive = useLive
+
+        let provider: any SnapshotProvider
+        if fixture == "error" {
+            provider = FailingSnapshotProvider()
+        } else if useLive, let baseURL = configuration.baseURL {
+            provider = RemoteSnapshotProvider(
+                baseURL: baseURL,
+                client: HTTPClient(
+                    session: Self.session(for: configuration),
+                    credentials: configuration.credentials
+                ),
+                // The dashboard's endpoint is /api/data.
+                path: "api/data"
+            )
+        } else {
+            provider = BundledSnapshotProvider(
                 resource: Self.resourceName(for: fixture),
                 bundle: .main
-              )
+            )
+        }
 
         // A UI-test run must not inherit a cache from a previous fixture — otherwise the
         // error fixture would fall back to cached data and never reach its failed state.
@@ -60,5 +84,14 @@ final class AppContainer {
         case "empty": return "snapshot-empty"
         default: return "snapshot"
         }
+    }
+
+    /// Pinned session when fingerprints are configured, default session otherwise.
+    ///
+    /// The dashboard's certificate is self-signed, so without a pin the connection
+    /// simply fails — which is the correct outcome, not something to work around.
+    nonisolated static func session(for configuration: AppConfiguration) -> URLSession {
+        guard !configuration.pinnedFingerprints.isEmpty else { return .shared }
+        return .pinned(to: CertificatePinner(fingerprints: configuration.pinnedFingerprints))
     }
 }

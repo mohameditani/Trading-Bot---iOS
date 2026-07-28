@@ -5,3 +5,7 @@ xcuserdata/
 *.xcuserstate
 .swiftpm/
 Packages/*/.build/
+
+# Dashboard credentials. Copy dashboard-config.example.json to
+# dashboard-config.json and fill it in locally — never commit it.
+TradingBot/Resources/dashboard-config.json

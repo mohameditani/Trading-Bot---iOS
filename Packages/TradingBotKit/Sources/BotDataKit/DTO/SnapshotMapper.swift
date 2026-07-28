@@ -23,7 +23,10 @@ enum SnapshotMapper {
             byRegime: dto.byRegime.map(map),
             aiReport: dto.aiReport.map(map),
             veto: dto.veto.map(map),
-            lessons: (dto.lessons ?? []).map(map)
+            lessons: (dto.lessons ?? []).map(map),
+            lastActivity: dto.lastActivity,
+            // Older payloads predate max_hold_hours; 72 is the bot's own default.
+            maxHoldHours: dto.maxHoldHours ?? 72
         )
     }
 
