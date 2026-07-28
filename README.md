@@ -31,7 +31,7 @@ with no networking, no SwiftUI, and no fixtures beyond plain values.
 ## Running the tests
 
 ```bash
-# Fast: package units only (116 tests)
+# Fast: package units only (156 tests)
 cd Packages/TradingBotKit && swift test
 
 # Everything: 57 cases — app ViewModels, accessibility, and 11 UI tests
@@ -79,12 +79,60 @@ These are computed and unit-tested instead:
 - **Breakdown bar widths** — normalised against the largest *absolute* net P/L, so a
   heavy loss reads full-width just as a heavy gain does.
 
-## Pointing at a live dashboard
+## Pointing at the live dashboard
 
-`TradingBot/AppContainer.swift` is the only place that chooses a data source. Replace
-`BundledSnapshotProvider` with `RemoteSnapshotProvider(baseURL:)`. Nothing else changes —
-`HTTPClient` and `RemoteSnapshotProvider` are already implemented and tested against a
-mock `URLProtocol`.
+The app talks to the bot's read-only Flask dashboard (`dashboard.py` in the
+`Trading-Bot` repo), which serves `GET /api/data` behind HTTP Basic auth.
+
+```bash
+cd TradingBot/Resources
+cp dashboard-config.example.json dashboard-config.json
+# then fill in "password" — the DASHBOARD_PASSWORD from the bot's .env
+```
+
+`dashboard-config.json` is **gitignored**. With the file absent, or any of
+`baseURL`/`username`/`password` left blank, the app stays on its bundled sample
+snapshot — so a half-filled config can never send a placeholder credential into the
+dashboard's per-IP lockout.
+
+Three details of that server the app has to accommodate:
+
+**Naive timestamps.** The bot writes `datetime.now().isoformat()` — no timezone
+(`2026-06-24T03:25:02.737831`). Foundation's `.iso8601` strategy rejects those
+outright, so `BotDate` parses them explicitly and assumes UTC. That assumption lives
+in one constant, `BotDate.assumedZoneForNaiveTimestamps`; change it if the host is
+ever moved off UTC.
+
+**A self-signed certificate.** `CN=trading-dashboard`, so iOS refuses it by default.
+The app pins its SHA-256 fingerprint rather than disabling ATS — an ATS exception
+would accept *any* certificate for that address, while a pin accepts exactly one.
+Re-read the fingerprint after rotating the cert:
+
+```bash
+echo | openssl s_client -connect 165.227.151.108:8443 2>/dev/null \
+  | openssl x509 -outform DER | shasum -a 256
+```
+
+`certificateSHA256` takes a list, so you can carry the old and new pins together
+across a rotation.
+
+**Failure modes that must not be retried.** `401` (bad credentials), `429` (the
+dashboard's 5-minute per-IP lockout after 10 failures) and `503` (fail-closed when
+`DASHBOARD_PASSWORD` is unset) each map to their own message and are never retried —
+retrying a 401 is precisely how a wrong password becomes a lockout.
+
+## Is the bot still alive?
+
+The header's `just now / 12s ago` describes **our fetch**. The dashboard keeps serving
+its last payload after the bot process stops, so that alone would read "just now" for
+a bot that died days ago.
+
+The app therefore also shows the bot's own heartbeat — `last_activity`, the newest
+ledger write — as `last trade Nh ago`, and turns the status dot red once that exceeds
+the bot's `MAX_HOLD_HOURS`. That threshold is the bot's own: it force-closes any
+position older than the window, so it cannot stay silent through one while holding a
+position. It still cannot *prove* the process died — a genuinely quiet market also
+stops producing writes — so it reports the gap and leaves the judgement to you.
 
 ## Fonts
 
