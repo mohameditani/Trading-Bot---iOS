@@ -133,7 +133,9 @@ enum SnapshotMapper {
 public enum SnapshotDecoder {
     public static func decode(_ data: Data) throws -> Snapshot {
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
+        // Not `.iso8601`: the bot emits naive timestamps with no timezone, which that
+        // strategy rejects outright. See BotDate.
+        decoder.dateDecodingStrategy = .botTimestamp
         let dto = try decoder.decode(SnapshotDTO.self, from: data)
         return SnapshotMapper.map(dto)
     }

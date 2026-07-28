@@ -8,23 +8,32 @@ public struct HTTPClient: Sendable {
     private let session: URLSession
     private let maxRetries: Int
     private let retryDelay: Duration
+    private let credentials: BasicCredentials?
 
     public init(
         session: URLSession = .shared,
         maxRetries: Int = 2,
-        retryDelay: Duration = .milliseconds(400)
+        retryDelay: Duration = .milliseconds(400),
+        credentials: BasicCredentials? = nil
     ) {
         self.session = session
         self.maxRetries = maxRetries
         self.retryDelay = retryDelay
+        self.credentials = credentials
     }
 
     /// Convenience for tests that want a delay expressed in whole milliseconds.
-    public init(session: URLSession, maxRetries: Int, retryDelay: Int) {
+    public init(
+        session: URLSession,
+        maxRetries: Int,
+        retryDelay: Int,
+        credentials: BasicCredentials? = nil
+    ) {
         self.init(
             session: session,
             maxRetries: maxRetries,
-            retryDelay: .milliseconds(retryDelay)
+            retryDelay: .milliseconds(retryDelay),
+            credentials: credentials
         )
     }
 
@@ -44,14 +53,34 @@ public struct HTTPClient: Sendable {
     }
 
     private func perform(_ url: URL) async throws -> Data {
+        var request = URLRequest(url: url)
+        if let credentials, !credentials.isEmpty {
+            request.setValue(
+                credentials.authorizationHeaderValue,
+                forHTTPHeaderField: "Authorization"
+            )
+        }
+
         let data: Data
         let response: URLResponse
         do {
-            (data, response) = try await session.data(from: url)
+            (data, response) = try await session.data(for: request)
         } catch let urlError as URLError {
-            throw urlError.code == .notConnectedToInternet
-                ? SnapshotError.offline
-                : SnapshotError.transport(urlError.localizedDescription)
+            switch urlError.code {
+            case .notConnectedToInternet:
+                throw SnapshotError.offline
+            case .serverCertificateUntrusted,
+                 .serverCertificateHasBadDate,
+                 .serverCertificateHasUnknownRoot,
+                 .serverCertificateNotYetValid,
+                 .cancelled:
+                // The pinning delegate cancels the challenge on a mismatch, which
+                // surfaces here as .cancelled — report it as what it actually is
+                // rather than as a generic transport failure.
+                throw SnapshotError.certificateMismatch
+            default:
+                throw SnapshotError.transport(urlError.localizedDescription)
+            }
         } catch {
             throw SnapshotError.transport(error.localizedDescription)
         }
@@ -59,10 +88,19 @@ public struct HTTPClient: Sendable {
         guard let http = response as? HTTPURLResponse else {
             throw SnapshotError.transport("Response was not HTTP.")
         }
-        guard (200..<300).contains(http.statusCode) else {
+
+        switch http.statusCode {
+        case 200..<300:
+            return data
+        case 401:
+            throw SnapshotError.unauthorized
+        case 429:
+            throw SnapshotError.lockedOut
+        case 503:
+            throw SnapshotError.dashboardNotConfigured
+        default:
             throw SnapshotError.server(status: http.statusCode)
         }
-        return data
     }
 
     private func isRetryable(_ error: SnapshotError) -> Bool {
@@ -71,6 +109,10 @@ public struct HTTPClient: Sendable {
             return true
         case .server(let status):
             return status >= 500
+        // Never retry these: bad credentials stay bad, and retrying into the
+        // dashboard's per-IP lockout is exactly how a 401 becomes a 429.
+        case .unauthorized, .lockedOut, .dashboardNotConfigured, .certificateMismatch:
+            return false
         default:
             return false
         }

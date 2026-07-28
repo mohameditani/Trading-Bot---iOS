@@ -15,6 +15,15 @@ public enum SnapshotError: Error, Equatable {
     case transport(String)
     case server(status: Int)
     case offline
+    /// 401 — wrong or missing dashboard credentials.
+    case unauthorized
+    /// 429 — the dashboard locks an IP out for 5 minutes after 10 failed attempts.
+    case lockedOut
+    /// 503 — the dashboard is running but `DASHBOARD_PASSWORD` is unset, so it
+    /// fail-closes every data route.
+    case dashboardNotConfigured
+    /// The TLS certificate did not match the pinned fingerprint.
+    case certificateMismatch
 
     public var userMessage: String {
         switch self {
@@ -30,6 +39,34 @@ public enum SnapshotError: Error, Equatable {
             return "The bot responded with an error (\(status))."
         case .offline:
             return "You appear to be offline."
+        case .unauthorized:
+            return "Dashboard credentials were rejected."
+        case .lockedOut:
+            return "Too many failed attempts — try again in a few minutes."
+        case .dashboardNotConfigured:
+            return "The dashboard has no password set."
+        case .certificateMismatch:
+            return "The bot's certificate did not match the expected one."
         }
+    }
+}
+
+/// HTTP Basic credentials for the dashboard.
+///
+/// Deliberately not `CustomStringConvertible` — nothing should be able to print these
+/// into a log by accident.
+public struct BasicCredentials: Sendable, Equatable {
+    public let username: String
+    public let password: String
+
+    public init(username: String, password: String) {
+        self.username = username
+        self.password = password
+    }
+
+    public var isEmpty: Bool { username.isEmpty || password.isEmpty }
+
+    public var authorizationHeaderValue: String {
+        "Basic " + Data("\(username):\(password)".utf8).base64EncodedString()
     }
 }

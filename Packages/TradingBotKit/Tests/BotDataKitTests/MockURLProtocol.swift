@@ -22,12 +22,27 @@ final class MockURLProtocol: URLProtocol {
     /// The last entry repeats once the queue is down to one.
     nonisolated(unsafe) private static var queue: [Response] = []
     nonisolated(unsafe) private static var requestCount = 0
+    nonisolated(unsafe) private static var authorizationHeader: String?
     private static let lock = NSLock()
 
     static func reset(with responses: [Response]) {
         lock.lock()
         queue = responses
         requestCount = 0
+        authorizationHeader = nil
+        lock.unlock()
+    }
+
+    /// The `Authorization` header of the most recent request, or nil if none was sent.
+    static var lastAuthorizationHeader: String? {
+        lock.lock()
+        defer { lock.unlock() }
+        return authorizationHeader
+    }
+
+    static func record(authorization: String?) {
+        lock.lock()
+        authorizationHeader = authorization
         lock.unlock()
     }
 
@@ -56,6 +71,9 @@ final class MockURLProtocol: URLProtocol {
     override func stopLoading() {}
 
     override func startLoading() {
+        MockURLProtocol.record(
+            authorization: request.value(forHTTPHeaderField: "Authorization")
+        )
         let response = MockURLProtocol.next()
         if let error = response.error {
             client?.urlProtocol(self, didFailWithError: error)
