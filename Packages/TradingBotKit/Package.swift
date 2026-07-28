@@ -24,7 +24,11 @@ let package = Package(
         ),
         .testTarget(name: "BotDomainTests", dependencies: ["BotDomain"]),
         .testTarget(name: "BotFormattingTests", dependencies: ["BotFormatting"]),
-        .testTarget(name: "BotDataKitTests", dependencies: ["BotDataKit"]),
+        .testTarget(
+            name: "BotDataKitTests",
+            dependencies: ["BotDataKit"],
+            resources: [.process("Fixtures")]
+        ),
         .testTarget(name: "BotDesignSystemTests", dependencies: ["BotDesignSystem"]),
     ]
 )

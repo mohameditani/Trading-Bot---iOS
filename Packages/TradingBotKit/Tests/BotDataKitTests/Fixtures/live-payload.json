@@ -1,0 +1,603 @@
+{
+  "generated_at": "2026-07-28T12:13:09",
+  "summary": {
+    "total": 21,
+    "wins": 4,
+    "losses": 17,
+    "win_rate": 19.0,
+    "total_pnl": 37.9,
+    "balance": 53.7,
+    "open": 1,
+    "today_total": 0,
+    "today_wins": 0,
+    "today_losses": 0,
+    "today_pnl": 55.5,
+    "equity": 68.5
+  },
+  "scorecard": {
+    "sample_start": "2026-07-01T19:16:03",
+    "n": 10,
+    "wins": 2,
+    "losses": 8,
+    "win_rate": 20.0,
+    "backtest_win_rate": 40.0,
+    "avg_win": 3.38,
+    "avg_loss": 1.93,
+    "rr": 1.75,
+    "design_rr": 2.0,
+    "net": -8.68,
+    "expectancy": -0.868,
+    "projected_expectancy": 0.2,
+    "streak": 6,
+    "streak_p": 16.7,
+    "max_drawdown": 11.73,
+    "directions": {
+      "long": 8,
+      "short": 2
+    },
+    "time_stops": 0,
+    "time_stop_net": 0,
+    "learning_at": 20,
+    "gate1_at": 25
+  },
+  "last_activity": "2026-07-15T03:50:19.670972",
+  "max_hold_hours": 72.0,
+  "curve": [
+    {
+      "t": "2026-06-24",
+      "ts": "2026-06-24T12:25",
+      "equity": 100.0,
+      "clean": false
+    },
+    {
+      "t": "2026-06-24",
+      "ts": "2026-06-24T12:25",
+      "equity": 99.5,
+      "clean": false
+    },
+    {
+      "t": "2026-06-24",
+      "ts": "2026-06-24T22:25",
+      "equity": 99.0,
+      "clean": false
+    },
+    {
+      "t": "2026-06-26",
+      "ts": "2026-06-26T07:26",
+      "equity": 104.5,
+      "clean": false
+    },
+    {
+      "t": "2026-06-26",
+      "ts": "2026-06-26T10:26",
+      "equity": 104.0,
+      "clean": false
+    },
+    {
+      "t": "2026-06-26",
+      "ts": "2026-06-26T15:27",
+      "equity": 103.5,
+      "clean": false
+    },
+    {
+      "t": "2026-06-27",
+      "ts": "2026-06-27T22:28",
+      "equity": 109.0,
+      "clean": false
+    },
+    {
+      "t": "2026-06-28",
+      "ts": "2026-06-28T09:28",
+      "equity": 108.5,
+      "clean": false
+    },
+    {
+      "t": "2026-06-30",
+      "ts": "2026-06-30T14:04",
+      "equity": 108.0,
+      "clean": false
+    },
+    {
+      "t": "2026-07-01",
+      "ts": "2026-07-01T14:57",
+      "equity": 113.5,
+      "clean": false
+    },
+    {
+      "t": "2026-07-02",
+      "ts": "2026-07-02T00:11",
+      "equity": 113.0,
+      "clean": true
+    },
+    {
+      "t": "2026-07-02",
+      "ts": "2026-07-02T11:04",
+      "equity": 112.5,
+      "clean": true
+    },
+    {
+      "t": "2026-07-02",
+      "ts": "2026-07-02T12:07",
+      "equity": 118.0,
+      "clean": false
+    },
+    {
+      "t": "2026-07-02",
+      "ts": "2026-07-02T12:07",
+      "equity": 117.5,
+      "clean": false
+    },
+    {
+      "t": "2026-07-02",
+      "ts": "2026-07-02T15:01",
+      "equity": 117.0,
+      "clean": true
+    },
+    {
+      "t": "2026-07-04",
+      "ts": "2026-07-04T05:23",
+      "equity": 122.5,
+      "clean": true
+    },
+    {
+      "t": "2026-07-04",
+      "ts": "2026-07-04T10:23",
+      "equity": 122.0,
+      "clean": true
+    },
+    {
+      "t": "2026-07-06",
+      "ts": "2026-07-06T13:38",
+      "equity": 121.5,
+      "clean": true
+    },
+    {
+      "t": "2026-07-07",
+      "ts": "2026-07-07T03:39",
+      "equity": 127.0,
+      "clean": true
+    },
+    {
+      "t": "2026-07-09",
+      "ts": "2026-07-09T07:03",
+      "equity": 126.5,
+      "clean": true
+    },
+    {
+      "t": "2026-07-13",
+      "ts": "2026-07-13T17:44",
+      "equity": 126.0,
+      "clean": true
+    },
+    {
+      "t": "2026-07-14",
+      "ts": "2026-07-14T12:45",
+      "equity": 131.5,
+      "clean": true
+    }
+  ],
+  "open_positions": [
+    {
+      "pair": "BTCUSDT",
+      "direction": "long",
+      "entry_price": 54.7,
+      "quantity": 87.7,
+      "leverage": 2,
+      "margin": 56.2,
+      "take_profit": 46.8,
+      "stop_loss": 85.1,
+      "timestamp": "2026-07-15T03:50:19.670972",
+      "exchange_stops": true
+    }
+  ],
+  "closed_trades": [
+    {
+      "closed_at": "2026-07-14T12:45:21.780078",
+      "pair": "SOLUSDT",
+      "direction": "short",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_down",
+      "confidence": 9,
+      "timestamp": "2026-07-13T19:44:22.136497",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-07-13T17:44:09.170037",
+      "pair": "BTCUSDT",
+      "direction": "long",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_up",
+      "confidence": 8,
+      "timestamp": "2026-07-09T07:03:53.562374",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-07-09T07:03:49.750686",
+      "pair": "SOLUSDT",
+      "direction": "short",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_down",
+      "confidence": 8,
+      "timestamp": "2026-07-09T04:03:42.574769",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-07-07T03:39:19.581237",
+      "pair": "SOLUSDT",
+      "direction": "long",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_up",
+      "confidence": 9,
+      "timestamp": "2026-07-06T22:39:07.492753",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-07-06T13:38:41.759455",
+      "pair": "BTCUSDT",
+      "direction": "long",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_up",
+      "confidence": 8,
+      "timestamp": "2026-07-04T12:24:08.631626",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-07-04T10:23:56.294024",
+      "pair": "SOLUSDT",
+      "direction": "long",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_up",
+      "confidence": 7,
+      "timestamp": "2026-07-04T05:23:42.808184",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-07-04T05:23:39.188367",
+      "pair": "SOLUSDT",
+      "direction": "long",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_tp",
+      "regime": "trending_up",
+      "confidence": 7,
+      "timestamp": "2026-07-03T07:22:41.154347",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-07-02T15:01:46.715850",
+      "pair": "SOLUSDT",
+      "direction": "long",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_up",
+      "confidence": 6,
+      "timestamp": "2026-07-02T12:27:49.859296",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-07-02T12:07:24.000000",
+      "pair": "SOLUSDT",
+      "direction": "long",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_tp",
+      "regime": "trending_up",
+      "confidence": 8,
+      "timestamp": "2026-07-02T11:04:19.999205",
+      "exit_reason": null,
+      "note": "Recovered trade: opened by the pre-fix bot during the numpy-bool crash loop (never persisted; margin never deducted from ledger); closed manually at market during recovery."
+    },
+    {
+      "closed_at": "2026-07-02T12:07:24.000000",
+      "pair": "SOLUSDT",
+      "direction": "long",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_up",
+      "confidence": 6,
+      "timestamp": "2026-07-02T11:51:31.686900",
+      "exit_reason": null,
+      "note": "Closed manually (whole-position market close during crash recovery; fees exceeded the tiny price move). Not a strategy stop-out."
+    },
+    {
+      "closed_at": "2026-07-02T11:04:14.805400",
+      "pair": "SOLUSDT",
+      "direction": "long",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_tp",
+      "regime": "trending_up",
+      "confidence": 9,
+      "timestamp": "2026-07-02T02:11:15.222731",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-07-02T00:11:07.766672",
+      "pair": "SOLUSDT",
+      "direction": "long",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_up",
+      "confidence": 7,
+      "timestamp": "2026-07-01T22:11:01.615160",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-07-01T14:57:10.027974",
+      "pair": "BTCUSDT",
+      "direction": "short",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_down",
+      "confidence": 9,
+      "timestamp": "2026-06-30T14:04:22.806326",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-06-30T14:04:19.584391",
+      "pair": "BTCUSDT",
+      "direction": "short",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_tp",
+      "regime": "ranging",
+      "confidence": 9,
+      "timestamp": "2026-06-28T10:28:50.102331",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-06-28T09:28:46.705387",
+      "pair": "SOLUSDT",
+      "direction": "short",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "transitioning",
+      "confidence": 7,
+      "timestamp": "2026-06-28T01:28:31.125621",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-06-27T22:28:17.459086",
+      "pair": "SOLUSDT",
+      "direction": "long",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_up",
+      "confidence": 7,
+      "timestamp": "2026-06-26T15:27:14.238932",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-06-26T15:27:10.531682",
+      "pair": "BTCUSDT",
+      "direction": "short",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "transitioning",
+      "confidence": 8,
+      "timestamp": "2026-06-26T11:27:02.446395",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-06-26T10:26:52.678215",
+      "pair": "SOLUSDT",
+      "direction": "long",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_up",
+      "confidence": 7,
+      "timestamp": "2026-06-26T07:26:47.033480",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-06-26T07:26:43.460309",
+      "pair": "BTCUSDT",
+      "direction": "short",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_down",
+      "confidence": 9,
+      "timestamp": "2026-06-25T17:26:15.372612",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-06-24T22:25:52.431535",
+      "pair": "SOLUSDT",
+      "direction": "short",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_down",
+      "confidence": 9,
+      "timestamp": "2026-06-24T20:25:48.728090",
+      "exit_reason": null,
+      "note": null
+    },
+    {
+      "closed_at": "2026-06-24T12:25:21.152267",
+      "pair": "SOLUSDT",
+      "direction": "short",
+      "entry_price": 87.2,
+      "exit_price": 27.8,
+      "quantity": 80.7,
+      "pnl": 25.4,
+      "status": "closed_sl",
+      "regime": "trending_down",
+      "confidence": 7,
+      "timestamp": "2026-06-24T03:25:02.737831",
+      "exit_reason": null,
+      "note": null
+    }
+  ],
+  "by_symbol": [
+    {
+      "key": "SOLUSDT",
+      "trades": 8,
+      "win_rate": 25.0,
+      "net_pnl": 33.4
+    },
+    {
+      "key": "BTCUSDT",
+      "trades": 2,
+      "win_rate": 0.0,
+      "net_pnl": 33.4
+    }
+  ],
+  "by_regime": [
+    {
+      "key": "trending_up",
+      "trades": 8,
+      "win_rate": 25.0,
+      "net_pnl": 33.4
+    },
+    {
+      "key": "trending_down",
+      "trades": 2,
+      "win_rate": 0.0,
+      "net_pnl": 33.4
+    }
+  ],
+  "ai_report": {
+    "date": "2026-06-30",
+    "narrative": "Choppy week; SOL shorts bled.",
+    "whats_working": [
+      "BTC longs in strong uptrend"
+    ],
+    "whats_losing": [
+      "SOL in ranging regime"
+    ],
+    "config_suggestions": [
+      {
+        "param": "ADX_TREND_MIN_SOLUSDT",
+        "current": "25",
+        "suggested": "30",
+        "rationale": "filter more chop"
+      }
+    ]
+  },
+  "veto": {
+    "proceed": 26,
+    "block": 2,
+    "scored": 24,
+    "proceed_win_rate": 41.7,
+    "rows": [
+      {
+        "ts": "2026-07-15T03:50:19.431943",
+        "symbol": "BTCUSDT",
+        "signal": "BUY",
+        "proceed": true,
+        "reason": "trend intact, no red flag",
+        "risk_flags": [
+          "low_adx_chop"
+        ],
+        "news_flag": false,
+        "outcome": "loss"
+      },
+      {
+        "ts": "2026-07-14T09:00:00.120000",
+        "symbol": "SOLUSDT",
+        "signal": "SELL",
+        "proceed": false,
+        "reason": "blow-off top risk",
+        "risk_flags": [
+          "rsi_overbought"
+        ],
+        "news_flag": false,
+        "outcome": null
+      }
+    ]
+  },
+  "lessons": [
+    {
+      "ts": "2026-07-15T04:10:00.998877",
+      "pair": "SOLUSDT",
+      "outcome": "closed_sl",
+      "lesson": "Avoid shorting into established support in a ranging market.",
+      "failure_pattern": "shorted into support",
+      "confidence": "high",
+      "tags": [
+        "support",
+        "ranging",
+        "short"
+      ]
+    }
+  ]
+}
